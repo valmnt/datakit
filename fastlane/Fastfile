@@ -1,0 +1,59 @@
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+# For a list of all available actions, check out
+#
+#     https://docs.fastlane.tools/actions
+#
+# For a list of all available plugins, check out
+#
+#     https://docs.fastlane.tools/plugins/available-plugins
+#
+
+# Uncomment the line if you want fastlane to automatically update itself
+# update_fastlane
+
+default_platform(:ios)
+
+desc "Testing, Merging into main, Pushing a tag, Sending message in discord"
+lane :deploy_release do |options|
+  begin
+    ensure_git_branch(
+      branch: 'develop'
+    )
+
+    ensure_git_status_clean()
+
+    # TESTS
+    run_tests(
+      devices: ["iPhone 13"],
+      scheme: "DataKit-Package")
+    
+    # MERGE
+    Dir.chdir("../")
+    sh("git checkout main")
+    sh("git merge develop")
+    Dir.chdir("./fastlane")
+    push_to_git_remote(
+      remote: "origin",
+      local_branch: "main",
+      remote_branch: "main",
+    )
+      
+    # TAGS
+    add_git_tag(
+      tag: "v" + String(options[:version])
+    )
+    push_git_tags()
+    
+    ## Notif
+    notification(
+      title: "DataKit",
+      message: "Framework successfully released ✅ !")
+  rescue => exception
+    ## Notif
+    notification(
+      title: "DataKit",
+      message: "Framework not released 🚨 !")
+  end
+end

@@ -8,17 +8,16 @@
 import CoreData
 
 @available(iOS 15.0, *)
-class Persistence {
+open class Persistence {
 
     // MARK: - Properties
     // MARK: Static
-    static let shared = Persistence()
+    public static let shared = Persistence()
 
     // MARK: Public
-    public var mainContext: NSManagedObjectContext
-
-    // MARK: Private
-    public let container: NSPersistentContainer
+    open var mainContext: NSManagedObjectContext
+    
+    open var container: NSPersistentContainer
 
     // MARK: - Lifecycle
     init(inMemory: Bool = false) {
