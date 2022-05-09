@@ -8,21 +8,17 @@
 import CoreData
 
 @available(iOS 15.0, *)
-class Persistence {
+open class Persistence {
 
     // MARK: - Properties
-    // MARK: Static
-    static let shared = Persistence()
+    // MARK: Open
+    open var container: NSPersistentContainer
 
-    // MARK: Public
-    public var mainContext: NSManagedObjectContext
-
-    // MARK: Private
-    public let container: NSPersistentContainer
+    open var dataManager: DataManager
 
     // MARK: - Lifecycle
-    init(inMemory: Bool = false) {
-        container = NSPersistentContainer(name: "")
+    public init(xcdatamodel: String, inMemory: Bool = false) {
+        container = NSPersistentContainer(name: xcdatamodel)
         if inMemory {
             container.persistentStoreDescriptions.first!.url = URL(fileURLWithPath: "/dev/null")
         }
@@ -32,6 +28,6 @@ class Persistence {
             }
         })
         container.viewContext.automaticallyMergesChangesFromParent = true
-        mainContext = container.viewContext
+        dataManager = DataManager(context: container.viewContext, container: container)
     }
 }
